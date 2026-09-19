@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dulce Antojito 🍓</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#fff8fb;color:#623c4b;font-family:Arial,sans-serif}
+header{background:linear-gradient(145deg,#ffd6e5,#fff0f6);padding:30px 18px 25px;text-align:center;border-bottom-left-radius:32px;border-bottom-right-radius:32px}
+.brand{font-size:34px;font-weight:800;color:#b64f76}.sub{font-size:15px;margin-top:7px;color:#895d6d}
+main{max-width:720px;margin:auto;padding:16px}.section-title{font-size:23px;margin:25px 2px 13px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.card{background:white;border:1px solid #f2d5e0;border-radius:20px;padding:15px;box-shadow:0 6px 18px #7d425010}.card h3{margin:0 0 6px;font-size:17px}.desc{font-size:12px;color:#987181;min-height:30px}.price{font-size:20px;font-weight:800;color:#d45f88;margin-top:8px}.add{border:0;background:#ed83a8;color:#fff;border-radius:12px;padding:10px 12px;font-weight:700;width:100%;margin-top:10px}
+.order{margin-top:28px;background:#fff;border-radius:23px;padding:18px;box-shadow:0 7px 24px #7d425014}.empty{color:#987181;font-size:14px}.item{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f3e0e7;padding:11px 0;gap:10px}.remove{border:0;background:#ffe1eb;color:#b64f76;border-radius:8px;padding:4px 8px}.total{text-align:right;font-size:23px;font-weight:800;margin-top:15px;color:#633d4d}
+label{display:block;font-weight:700;font-size:14px;margin-top:14px}input,select,textarea{width:100%;margin-top:6px;border:1px solid #e6c8d4;border-radius:12px;padding:12px;background:#fff;font:inherit;color:#623c4b}.send{width:100%;border:0;border-radius:14px;background:#25d366;color:#fff;font-size:17px;font-weight:800;padding:14px;margin-top:20px;cursor:pointer}.note{font-size:12px;color:#987181;text-align:center;margin-top:9px}
+footer{text-align:center;padding:28px 15px;color:#987181;font-size:14px}
+@media(max-width:420px){.grid{grid-template-columns:1fr}.brand{font-size:31px}}
+</style>
+</head>
+<body>
+<header><div class="brand">🍓 Dulce Antojito</div><div class="sub">Fresas con crema hechas con mucho amor 💗</div></header>
+<main>
+<h2 class="section-title">🍓 Fresas con crema</h2><div class="grid" id="regular"></div>
+<h2 class="section-title">✨ Fresas Premium</h2><div class="grid" id="premium"></div>
+<h2 class="section-title">🎀 Extras</h2><div class="grid" id="extras"></div>
+
+<section class="order">
+<h2 class="section-title" style="margin-top:0">🛒 Tu pedido</h2>
+<div id="cart" class="empty">Agrega tus productos para comenzar.</div>
+<div class="total">Total: $<span id="total">0</span></div>
+
+<h2 class="section-title">📋 Datos</h2>
+<label>Nombre<input id="name" placeholder="Tu nombre"></label>
+<label>Teléfono<input id="phone" placeholder="+56 9..."></label>
+<label>Modalidad<select id="delivery"><option>Retiro</option><option>Despacho</option></select></label>
+<label>Dirección<input id="address" placeholder="Solo si es despacho"></label>
+<label>Forma de pago<select id="payment"><option>Transferencia</option><option>Efectivo</option><option>Otro</option></select></label>
+<label>Observaciones<textarea id="notes" rows="3" placeholder="Alguna indicación para tu pedido..."></textarea></label>
+<button class="send" onclick="sendOrder()">📲 ENVIAR PEDIDO POR WHATSAPP</button>
+<div class="note">Tu pedido se enviará directamente a Dulce Antojito.</div>
+</section>
+</main>
+<footer>Instagram: @Dulceantojito_coronel<br>WhatsApp: +56 9 5880 9361</footer>
+
+<script>
+const WA="56958809361";
+const products=[
+["regular","Fresas 10 oz",3000,"2 salsas + 1 topping"],["regular","Fresas 12 oz",4000,"2 salsas + 2 toppings"],
+["regular","Fresas 16 oz",5000,"2 salsas + 3 toppings"],["regular","Fresas 1 litro",8000,"3 salsas + 3 toppings"],
+["premium","Nutefresa",7900,"Fresa Premium"],["premium","Fresita Dubai",7900,"Fresa Premium"],
+["premium","Fresarocher",7900,"Fresa Premium"],["premium","Raffaellofresa",7900,"Fresa Premium"],
+["extras","Nutella",500,"Extra"],["extras","Topping",500,"Extra"],["extras","Otra fruta",500,"Extra"]
+];
+let cart=[];
+const money=n=>n.toLocaleString("es-CL");
+function render(){["regular","premium","extras"].forEach(sec=>document.getElementById(sec).innerHTML=products.filter(p=>p[0]===sec).map(p=>`
+<div class="card"><h3>${p[1]}</h3><div class="desc">${p[3]}</div><div class="price">$${money(p[2])}</div><button class="add" onclick="add('${p[1]}',${p[2]})">Agregar</button></div>`).join(""))}
+function add(name,price){cart.push({name,price});draw()}
+function remove(i){cart.splice(i,1);draw()}
+function draw(){document.getElementById("cart").innerHTML=cart.length?cart.map((p,i)=>`<div class="item"><span>${p.name}</span><b>$${money(p.price)} <button class="remove" onclick="remove(${i})">×</button></b></div>`).join(""):'<div class="empty">Agrega tus productos para comenzar.</div>';document.getElementById("total").textContent=money(cart.reduce((a,p)=>a+p.price,0))}
+function sendOrder(){
+ if(!cart.length)return alert("Agrega al menos un producto.");
+ const name=document.getElementById("name").value.trim();if(!name)return alert("Ingresa tu nombre.");
+ const items=cart.map(p=>`• ${p.name} — $${money(p.price)}`).join("\n"),total=cart.reduce((a,p)=>a+p.price,0);
+ const msg=`🍓 *NUEVO PEDIDO — DULCE ANTOJITO*\n\n👤 Nombre: ${name}\n📱 Teléfono: ${document.getElementById("phone").value||"No indicado"}\n🚚 Modalidad: ${document.getElementById("delivery").value}\n📍 Dirección: ${document.getElementById("address").value||"No indicada"}\n💳 Pago: ${document.getElementById("payment").value}\n\n🛒 *PEDIDO*\n${items}\n\n💰 *TOTAL: $${money(total)}*\n\n📝 Observaciones: ${document.getElementById("notes").value||"Ninguna"}`;
+ location.href=`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`;
+}
+render();draw();
+</script>
+</body></html>
